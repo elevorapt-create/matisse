@@ -3,8 +3,32 @@
   "name": "matisse",
   "main": "src/worker.js",
   "compatibility_date": "2026-11-10",
-  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
-  "d1_databases": [{ "binding": "DB", "database_name": "matisse-crm", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }],
-  "vars": { "ENVIRONMENT": "development", "WHATSAPP_NUMBER": "", "CONTACT_ENABLED": "false" },
-  "observability": { "enabled": false }
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "matisse-crm",
+      "database_id": "d7c2fd8b-5cd2-4680-adff-e2fee1930234",
+      "migrations_dir": "migrations",
+      "jurisdiction": "eu"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "WHATSAPP_NUMBER": "351928276081",
+    "CONTACT_ENABLED": "true"
+  },
+  "observability": {
+    "enabled": false
+  },
+  "account_id": "c7d42b8f010ebece7bf18127b5ba38ca",
+  "triggers": {
+    "crons": [
+      "17 3 * * *"
+    ]
+  }
 }

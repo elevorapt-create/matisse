@@ -2,7 +2,7 @@
 
 Landing page e CRM para o Worker existente `matisse`. Implementação local: HTML/CSS/JavaScript, Cloudflare Workers e D1. Sem framework nem serviços externos adicionais no runtime.
 
-**Estado:** versão local testável, sem publicação. Consulte [docs/ESTADO.md](docs/ESTADO.md) para limitações, auditoria, materiais oficiais e requisitos reais de produção. O identificador D1 nulo permite desenvolvimento local; não representa uma base de produção. A recolha pública de contactos fica desativada por defeito.
+**Estado:** versão preparada para o Worker existente com D1 de produção na UE. Consulte [docs/ESTADO.md](docs/ESTADO.md) para funcionalidades e limitações, e `docs/PUBLICACAO.md` para a evidência da publicação. Os comandos de desenvolvimento usam D1 local; a opção `--remote` atua sobre produção e deve ser usada apenas com revisão do destino.
 
 ## Desenvolvimento
 
@@ -38,4 +38,4 @@ Migrations podem ser repetidas: só são aplicadas as pendentes. Nenhum segredo 
 
 ## Publicação
 
-Não existe script de deploy nem workflow automático incluído. O utilizador já autorizou a publicação. O push de código para main pode ser realizado depois dos testes; o deploy do Worker continua dependente do acesso e dos bindings finais de produção descritos em `docs/CLOUDFLARE.md`. Não criar outro Worker. Não assumir que processos locais, configuração .dev.vars ou autenticação sobrevivem a uma nova máquina.
+Não existe script de deploy nem workflow automático incluído. O utilizador autorizou a publicação e o acesso Cloudflare já foi verificado. Fazer push para main depois dos testes e deploy com Wrangler no Worker existente. Ver `docs/CLOUDFLARE.md` para a sequência; o token atual não permite confirmar Cloudflare Builds. Não assumir deploy automático por main. Não criar outro Worker. Não assumir que processos locais, configuração .dev.vars ou autenticação sobrevivem a uma nova máquina.

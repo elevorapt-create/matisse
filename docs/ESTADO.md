@@ -1,49 +1,41 @@
 # Matisse — estado de implementação
 
-## Concluído e testado localmente
+Atualizado em 10 de novembro de 2026. Esta versão está preparada para publicar no Worker existente; os resultados do deploy são registados em `PUBLICACAO.md` depois da verificação externa.
 
-- Landing page em português, responsiva, cores oficiais #fafafa, #1e1e1c e #b13015. Logótipo e sublogo originais copiados sem alteração do ZIP autorizado.
-- Formulário modal único para todos os CTAs de contacto, incluindo o botão flutuante. Ícone WhatsApp; navegação por teclado, Escape, foco e estados de erro.
-- Nome, e-mail, telefone e serviço obrigatórios. Preferência temporal, objetivo e observações opcionais. Marketing e medição independentes e opcionais.
-- Worker com validação de servidor, limite de tamanho de pedidos, verificação de origem, honeypot, tempo mínimo e rate limit persistente. Sem envio de mensagens automáticas.
-- D1 local: leads, consentimentos, UTMs quando há medição, CTA, origem, estados e histórico. Gravação em transação e chave de idempotência. WhatsApp disponibilizado apenas após confirmação de persistência.
-- CRM: seis estados, totais globais, grupos por serviço/origem/estado, taxa calculada sobre estado atual, lista dos 500 pedidos mais recentes, pesquisa/filtro, histórico e apagamento.
-- Admin com palavra-passe derivada PBKDF2-SHA256, sessão opaca de oito horas, cookie HttpOnly, SameSite=Strict, Secure em HTTPS, revogação no servidor e rate limit de login. Um único perfil administrativo; não há gestão multiutilizador.
-- Eventos de utilização apenas com consentimento de medição; conversões Lead, Schedule e AppointmentAttended registadas no servidor após gravação/transição. Chaves estáveis evitam duplicação. Google/Meta desativados.
-- Cabeçalhos de segurança, CSP, respostas administrativas/API sem cache, noindex/nofollow e robots bloqueado. Sitemap provisório intencionalmente vazio; canonical de produção pendente de domínio definitivo.
-- Documentos de privacidade/cookies provisórios, sem inventar dados legais. Formulário desativado na configuração publicada do código; a ativação existe apenas em .dev.vars local para testes.
+## Implementado
 
-## Auditoria externa
+- Landing page em português, responsiva, com paleta e logótipos oficiais e duas imagens editoriais criadas com IA, identificadas como ilustrações.
+- Formulário único: nome, e-mail, WhatsApp e serviço; campos opcionais para preferência temporal, objetivo e observações. Marketing e medição são escolhas facultativas e separadas.
+- Worker com validação no servidor, limite de tamanho, verificação de origem, honeypot, tempo mínimo e rate limit persistente. O WhatsApp só fica disponível após confirmação da gravação. Nenhuma mensagem é enviada automaticamente.
+- CRM: seis estados, métricas globais, grupos por serviço/origem/estado, taxa baseada nos estados atuais, listagem dos 500 pedidos mais recentes, pesquisa, filtros, histórico e eliminação de dados. Alterações concorrentes de estado são verificadas antes de confirmar.
+- Administração protegida por palavra-passe derivada com PBKDF2, sessões opacas de oito horas, cookie HttpOnly/SameSite Strict/Secure em HTTPS, rate limit e revogação no logout. Não existe gestão multiutilizador.
+- Eventos PageView/ViewService/OpenLeadForm/ClickWhatsApp mediante consentimento. Lead/Schedule/AppointmentAttended apenas no servidor após operações confirmadas, com deduplicação. UTMs não são guardadas sem consentimento de medição.
+- Limpeza automática diária: pedidos e histórico após 180 dias sem atualização; eventos após 90 dias; auditoria administrativa não associada a pedidos após 365 dias; sessões e limites expirados eliminados. Teste em SQLite local verifica expurgo e preservação dos dados recentes.
+- Privacidade, cookies e utilização do website descrevem os dados e funcionalidades implementados, com contacto transcrito dos materiais oficiais. Não há pagamento, reserva automática ou taxas de cancelamento inventadas.
+- CSP e cabeçalhos de segurança; respostas da API sem cache; noindex/nofollow, robots bloqueado e sitemap provisório vazio. Canonical/indexação ficam dependentes do domínio definitivo.
 
-- Worker https://matisse.elevora-pt.workers.dev/: HTTP 200, text/plain, «Hello world» em 10/11/2026.
-- Repositório GitHub elevorapt-create/matisse: vazio, default_branch main na API, sem referências Git, workflows ou deployments registados na API consultada.
-- Consulta de webhooks: HTTP 403 «Resource not accessible by integration». Não permite confirmar ou excluir integração Cloudflare Builds. Não há acesso autenticado Cloudflare configurado nesta sessão.
-- Não foi criado outro Worker, base remota, domínio ou repositório. A definição D1 no ficheiro Wrangler é um identificador nulo de desenvolvimento local, não uma base de produção existente.
-- Não houve push ou deploy. A instrução mais recente de não publicar foi mantida.
+## Cloudflare
 
-## Materiais
+- Conta autenticada pelo token introduzido pelo utilizador, sem expor o valor. Worker existente `matisse` confirmado; antes desta publicação respondia «Hello world» e não tinha bindings.
+- Criada base exclusiva `matisse-crm`, jurisdição UE, ID d7c2fd8b-5cd2-4680-adff-e2fee1930234, ligada como DB. Duas bases de outro projeto existentes na conta não foram alteradas.
+- Migrations 0001 e 0002 aplicadas na base remota. Configurados ADMIN_PASSWORD_HASH e SESSION_SECRET exclusivos de produção; sem reutilizar a palavra-passe de testes.
+- Cloudflare Builds: consulta devolve 403 com este token. Não se pode afirmar que main está ligado ao deploy automático. O deploy desta versão é feito diretamente com Wrangler no Worker existente, depois do push do código testado para main.
+- Nenhum Worker, domínio ou repositório alternativo foi criado.
 
-Fontes locais: ZIP drive-download-20261018T224556Z-1-001.zip. Usados LOGO .png e SUBLOGO .png; paleta e aplicações consultadas como referência. Le Grand Capital e High Spirited estão indicadas no guia, mas os binários e as licenças web não foram fornecidos. O logótipo mantém a sua tipografia original; o restante texto usa Georgia/Arial provisoriamente.
+## Validação
 
-As nove fotografias anexadas inline foram vistas na conversa e selecionadas editorialmente, mas não estão expostas como ficheiros nesta máquina. Nenhum retrato foi fabricado. Hero e secção sobre a Jaine usam temporariamente a identidade oficial; ainda faltam as fotografias em ficheiros acessíveis para a composição final. O ZIP de fotografias maior que 32 MiB não pôde ser transferido.
+- `npm run check`: sintaxe dos módulos.
+- `npm test`: sete testes, incluindo limpeza de dados em SQLite/workerd.
+- Smoke test: gravação, idempotência, validação, origem, eventos, autenticação, pipeline, histórico, apagamento e revogação da sessão.
+- Quatro testes Chromium: desktop, mobile, falha de gravação e login do CRM.
+- `npm run build`: dry-run do bundle e configuração Cloudflare.
+- Verificação pública pós-deploy: resultados e versão em `PUBLICACAO.md`.
 
-WhatsApp confirmado pelo utilizador: +351 928 276 081 (prevalece sobre o número antigo do cartão). Morada transcrita do cartão oficial: Avenida da República, 1226, 7.º andar, 4400-192 Vila Nova de Gaia. Horários não inventados.
+## Materiais e limites
 
-## Pendências antes de produção
-
-1. Confirmar no Cloudflare os settings do Worker existente, repositório/branch de Builds e bindings. Não há evidência suficiente para afirmar deploy automático por main.
-2. Reutilizar, se existir, uma base D1 adequada. Se não existir, será necessário aprovar a criação/associação de persistência remota antes de a executar. Substituir database_id nulo pelo binding confirmado; aplicar migrations só após rever o destino e backups.
-3. Configurar ADMIN_PASSWORD_HASH e SESSION_SECRET via mecanismo de segredos do Worker. Nunca publicar .dev.vars nem LOCAL_ADMIN_PASSWORD. Usar HTTPS.
-4. Receber originais acessíveis dos retratos e trabalhos/salão. Não apresentar retratos como resultados de clientes. Galeria e avaliações foram omitidas até existirem trabalhos e testemunhos verificáveis.
-5. Confirmar nomenclatura dos seis serviços inicialmente indicados, texto de apresentação, morada atual e horários. A apresentação não contém biografia, qualificações ou resultados inventados.
-6. Rever responsável legal, NIF/contactos legais, fundamento do tratamento, fornecedores, retenção e exercício de direitos. Aprovar privacidade, cookies, termos e regras de marcação reais. Não há termos fictícios nem política de marcações publicada.
-7. Definir retenção e executar o procedimento de eliminação correspondente; o apagamento individual já existe, mas não há expurgo automático com prazo inventado.
-8. Só depois da revisão legal e operacional ativar CONTACT_ENABLED e WHATSAPP_NUMBER no ambiente público. Adicionar domínio definitivo/canonical, sitemap e indexação apenas após decisão de SEO.
-9. Configurar IDs Google/Meta e rotas/concessões necessárias numa tarefa posterior. Não existe envio de conversões para essas plataformas; apenas infraestrutura interna validada.
-10. Validar a fase final com fotografias, acessibilidade/performance em produção, autorização de publicação, push para main e confirmação de deploy no Worker existente. A ausência de push nesta sessão é intencional.
-
-## Atualização após autorização de publicação
-
-O utilizador autorizou imagens criadas e publicação. Foram geradas duas imagens editoriais ilustrativas, identificadas como IA no site, incorporadas no hero e na secção institucional. Não são resultados de clientes nem retratos da Jaine. Os logótipos oficiais permanecem intactos.
-
-A restrição anterior de não publicar foi revogada pelo utilizador. `wrangler whoami` confirmou que falta autenticação Cloudflare. Foi guardado o requisito secreto CLOUDFLARE_API_TOKEN e o destino api.cloudflare.com nas definições do ambiente. Ver `CLOUDFLARE.md` para as permissões e a sequência de validação. A autorização não constitui acesso autenticado nem prova de deploy.
+- Logótipo/sublogo e paleta do ZIP oficial preservados. Le Grand Capital e High Spirited não foram fornecidas como fontes web; texto usa Georgia/Arial, enquanto o logótipo mantém a tipografia original.
+- Retratos enviados inline foram vistos, mas não estão expostos como ficheiros nesta máquina. O utilizador autorizou imagens geradas: foram criadas duas imagens editoriais sem representar a Jaine, clientes, resultados, produtos endossados ou o espaço real.
+- WhatsApp confirmado pelo utilizador: +351 928 276 081. Morada e e-mail transcritos do cartão oficial. Não foram inventados horários, qualificações, biografia, preços, avaliações ou resultados.
+- Galeria de clientes e avaliações não são apresentadas enquanto não houver materiais verificáveis. Os serviços correspondem à lista inicial fornecida pelo utilizador.
+- Não existe integração ativa Google Ads, Google Analytics ou Meta. Não se afirma validação de conversões nessas plataformas. O envio exige os identificadores e configuração respetivos.
+- As condições específicas de cada marcação devem ser combinadas diretamente com a Matisse. Não foi criada uma política com prazos ou penalizações fictícias.

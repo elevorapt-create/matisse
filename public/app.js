@@ -4,7 +4,7 @@ for (const button of document.querySelectorAll('.contact')) button.insertAdjacen
 $('#open-whatsapp').insertAdjacentHTML('afterbegin',waIcon);
 let config = null, opener, openedAt = 0, leadId = null, consent = null;
 const storage = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k,v) { try { localStorage.setItem(k,v); } catch {} }, remove(k) { try { localStorage.removeItem(k); } catch {} } };
-try { consent = JSON.parse(storage.get('matisse-consent')); if (consent?.version !== 1) consent=null; } catch { consent=null; }
+try { consent = JSON.parse(storage.get('matisse-consent')); if (consent?.version !== 1 || !Number.isFinite(Date.parse(consent.at)) || Date.now()-Date.parse(consent.at)>180*86400000) consent=null; } catch { consent=null; }
 let pageTracked = false;
 async function track(name) {
  if (!consent?.analytics) return;

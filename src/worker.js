@@ -1,6 +1,6 @@
 export const SERVICES = ['Mechas e iluminação', 'Coloração personalizada', 'Cortes femininos', 'Alisamentos', 'Visagismo', 'Consultoria de cor'];
 export const STATUSES = ['Novo lead', 'Contactado', 'Em acompanhamento', 'Marcação confirmada', 'Serviço realizado', 'Perdido'];
-const PRIVACY = 'draft-2026-11-10';
+const PRIVACY = '2026-11-10';
 const encoder = new TextEncoder();
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
 const safeText = (v, max) => typeof v === 'string' ? v.trim().slice(0, max) : '';
@@ -73,10 +73,10 @@ async function handle(req, env) {
   if (!await rate(req, env, 'leads', 5, 900)) return json({ error: 'Demasiados pedidos. Tente mais tarde.' }, 429);
   const existing = await env.DB.prepare('SELECT name,email,phone,service,analytics_consent FROM leads WHERE id=?').bind(b.id).first();
   if (existing && ['name','email','phone','service'].some(key => existing[key] !== d[key])) return json({ error: 'Pedido já registado com outros dados. Volte a abrir o formulário.' },409);
-  const utms = {};
-  for (const k of ['utm_source','utm_medium','utm_campaign','utm_content','utm_term']) if (typeof b.utms?.[k] === 'string') utms[k] = safeText(b.utms[k], 200);
-  const source = utms.utm_source || 'direto';
   const analytics = existing ? existing.analytics_consent === 1 : b.analyticsConsent === true;
+  const utms = {};
+  if (analytics) for (const k of ['utm_source','utm_medium','utm_campaign','utm_content','utm_term']) if (typeof b.utms?.[k] === 'string') utms[k] = safeText(b.utms[k], 200);
+  const source = utms.utm_source || 'direto';
   const stamp = new Date().toISOString();
   await env.DB.batch([
    env.DB.prepare('INSERT OR IGNORE INTO leads(id,name,email,phone,service,timing,goal,notes,status,source,utms,cta,marketing_consent,analytics_consent,privacy_version,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(b.id,d.name,d.email,d.phone,d.service,d.timing,d.goal,d.notes,'Novo lead',source,JSON.stringify(utms),d.cta,b.marketingConsent === true ? 1 : 0,analytics ? 1 : 0,PRIVACY,stamp,stamp),
@@ -122,10 +122,16 @@ async function handle(req, env) {
    const lead = await env.DB.prepare('SELECT * FROM leads WHERE id=?').bind(match[1]).first();
    if (!lead) return json({ error: 'Registo não encontrado.' }, 404);
    if (lead.status === b.status) return json({ ok:true });
-   const statements = [env.DB.prepare('UPDATE leads SET status=?,updated_at=? WHERE id=? AND status=?').bind(b.status,new Date().toISOString(),lead.id,lead.status),audit(env,lead.id,'status_changed',{ from:lead.status,to:b.status })];
+   const stamp = new Date().toISOString();
+   const statements = [
+    env.DB.prepare('INSERT INTO audit SELECT ?,id,?,?,?,? FROM leads WHERE id=? AND status=?').bind(crypto.randomUUID(),'admin','status_changed',JSON.stringify({ from:lead.status,to:b.status }),stamp,lead.id,lead.status),
+    env.DB.prepare('UPDATE leads SET status=?,updated_at=? WHERE id=? AND status=?').bind(b.status,stamp,lead.id,lead.status)
+   ];
    const name = b.status === 'Marcação confirmada' ? 'Schedule' : b.status === 'Serviço realizado' ? 'AppointmentAttended' : null;
-   if (name && lead.analytics_consent) statements.push(event(env,`${lead.id}:${name}`,lead.id,name,'server'));
-   await env.DB.batch(statements); return json({ ok:true });
+   if (name) statements.push(env.DB.prepare('INSERT OR IGNORE INTO events SELECT ?,id,?,?,? FROM leads WHERE id=? AND status=? AND analytics_consent=1').bind(`${lead.id}:${name}`,name,'server',stamp,lead.id,b.status));
+   const result = await env.DB.batch(statements);
+   if (!result[1].meta.changes) return json({ error:'O pedido foi atualizado entretanto. Atualize a lista antes de tentar novamente.' },409);
+   return json({ ok:true });
   }
   if (match && req.method === 'DELETE') {
    await env.DB.batch([env.DB.prepare('DELETE FROM events WHERE lead_id=?').bind(match[1]), env.DB.prepare('DELETE FROM audit WHERE lead_id=?').bind(match[1]),env.DB.prepare('DELETE FROM leads WHERE id=?').bind(match[1]),audit(env,null,'lead_deleted',{ id:match[1] })]);
@@ -138,7 +144,19 @@ async function handle(req, env) {
  if (path === '/sitemap.xml') return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>',{headers:{'Content-Type':'application/xml'}});
  return env.ASSETS.fetch(req);
 }
-export default { async fetch(req,env) {
+export async function purgeExpiredData(env, now = Date.now()) {
+ const cutoff = days => new Date(now - days * 86400000).toISOString();
+ await env.DB.batch([
+  env.DB.prepare('DELETE FROM events WHERE lead_id IN (SELECT id FROM leads WHERE updated_at < ?)').bind(cutoff(180)),
+  env.DB.prepare('DELETE FROM audit WHERE lead_id IN (SELECT id FROM leads WHERE updated_at < ?)').bind(cutoff(180)),
+  env.DB.prepare('DELETE FROM leads WHERE updated_at < ?').bind(cutoff(180)),
+  env.DB.prepare('DELETE FROM events WHERE created_at < ?').bind(cutoff(90)),
+  env.DB.prepare('DELETE FROM audit WHERE created_at < ?').bind(cutoff(365)),
+  env.DB.prepare('DELETE FROM sessions WHERE expires_at < ?').bind(now),
+  env.DB.prepare('DELETE FROM rate_limits WHERE expires_at < ?').bind(Math.floor(now / 1000))
+ ]);
+}
+export default { scheduled(controller, env, ctx) { ctx.waitUntil(purgeExpiredData(env)); }, async fetch(req,env) {
  let res;
  try { res = await handle(req,env); } catch(e) { res = json({ error: e instanceof SyntaxError || /Pedido|Content-Type/.test(e.message) ? 'Pedido inválido.' : 'Não foi possível concluir. Tente novamente.' }, e instanceof SyntaxError || /Pedido|Content-Type/.test(e.message) ? 400 : 503); }
  const result = new Response(res.body,res);
