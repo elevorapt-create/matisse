@@ -32,9 +32,41 @@ tabs.forEach((tab,index)=>{
  });
 });
 const rail=document.querySelector('#service-rail');
-const dots=[...document.querySelectorAll('[data-slide]')];
-dots.forEach((dot,index)=>dot.addEventListener('click',()=>{
- const card=rail.children[index];const left=card.offsetLeft-rail.children[0].offsetLeft;
- rail.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
- dots.forEach((d,i)=>d.setAttribute('aria-pressed',String(i===index)));
-}));
+// Native touch scrolling; pointer capture supplies desktop mouse dragging.
+let drag=null;
+rail.addEventListener('pointerdown',event=>{
+ if(event.pointerType!=='mouse'||event.button!==0)return;
+ drag={id:event.pointerId,x:event.clientX,left:rail.scrollLeft};
+ rail.setPointerCapture(event.pointerId);rail.classList.add('is-dragging');event.preventDefault();
+});
+rail.addEventListener('pointermove',event=>{
+ if(!drag||event.pointerId!==drag.id)return;
+ rail.scrollLeft=drag.left-(event.clientX-drag.x);
+});
+function stopDrag(event){
+ if(!drag||event.pointerId!==drag.id)return;
+ if(rail.hasPointerCapture(drag.id))rail.releasePointerCapture(drag.id);
+ drag=null;rail.classList.remove('is-dragging');
+}
+rail.addEventListener('pointerup',stopDrag);
+rail.addEventListener('pointercancel',stopDrag);
+rail.addEventListener('lostpointercapture',()=>{drag=null;rail.classList.remove('is-dragging');});
+rail.addEventListener('keydown',event=>{
+ if(event.target!==rail)return;
+ const step=rail.children[0].getBoundingClientRect().width+17;
+ let left;
+ if(event.key==='ArrowRight')left=rail.scrollLeft+step;
+ else if(event.key==='ArrowLeft')left=rail.scrollLeft-step;
+ else if(event.key==='Home')left=0;
+ else if(event.key==='End')left=rail.scrollWidth;
+ else return;
+ event.preventDefault();rail.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+});
+document.querySelector('#load-map').addEventListener('click',()=>{
+ const frame=document.createElement('iframe');
+ frame.title='Localização da Matisse By Jaine Matos em Vila Nova de Gaia';
+ frame.src='https://www.google.com/maps?hl=pt-PT&q='+encodeURIComponent('Av. da República 1226 7.º andar, 4430-204 Vila Nova de Gaia, Portugal')+'&z=17&output=embed';
+ frame.loading='lazy';frame.referrerPolicy='no-referrer';frame.allowFullscreen=true;
+ document.querySelector('#location-map').append(frame);
+ document.querySelector('#map-consent').hidden=true;
+});

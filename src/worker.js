@@ -162,7 +162,7 @@ export default { scheduled(controller, env, ctx) { ctx.waitUntil(purgeExpiredDat
  let res;
  try { res = await handle(req,env); } catch(e) { res = json({ error: e instanceof SyntaxError || /Pedido|Content-Type/.test(e.message) ? 'Pedido inválido.' : 'Não foi possível concluir. Tente novamente.' }, e instanceof SyntaxError || /Pedido|Content-Type/.test(e.message) ? 400 : 503); }
  const result = new Response(res.body,res);
- for (const [k,v] of Object.entries({ 'X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','X-Frame-Options':'DENY','Permissions-Policy':'camera=(), microphone=(), geolocation=()','X-Robots-Tag':'noindex, nofollow','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'" })) result.headers.set(k,v);
+ for (const [k,v] of Object.entries({ 'X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','X-Frame-Options':'DENY','Permissions-Policy':'camera=(), microphone=(), geolocation=()','X-Robots-Tag':'noindex, nofollow','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-src https://www.google.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'" })) result.headers.set(k,v);
  if (new URL(req.url).pathname.startsWith('/api/') || new URL(req.url).pathname.startsWith('/admin')) result.headers.set('Cache-Control','no-store');
  return result;
 } };

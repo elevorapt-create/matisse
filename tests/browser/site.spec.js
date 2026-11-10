@@ -15,7 +15,7 @@ test('desktop: consentimento, formulário e WhatsApp só após registo',async({p
 test('mobile: sem overflow e formulário contextualizado acessível por teclado',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');await page.getByRole('button',{name:'Só necessários'}).click();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- await page.getByRole('button',{name:'Conversar sobre mechas'}).click();await expect(page.getByLabel('Serviço pretendido')).toHaveValue('Mechas e iluminação');await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();
+ await page.getByRole('button',{name:'Quero escolher o meu serviço'}).click();await expect(page.getByLabel('Serviço pretendido')).toHaveValue('');await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();
  await page.screenshot({path:'test-results/mobile.png',fullPage:true});
 });
 test('erros de gravação não abrem o WhatsApp',async({page})=>{
@@ -39,4 +39,19 @@ test('formulário do final da página regista um pedido sem precisar de abrir um
  await page.waitForTimeout(1600);const response=page.waitForResponse(r=>r.url().endsWith('/api/leads')&&r.request().method()==='POST');await page.getByRole('button',{name:'Registar pedido e continuar'}).click();const savedResponse=await response;expect(savedResponse.status()).toBe(201);const saved=await savedResponse.json();expect(JSON.parse(savedResponse.request().postData()).cta).toBe('inline-form');await expect(page.locator('#lead-success')).toBeVisible();await expect(page.getByRole('dialog')).not.toBeVisible();
  const password=process.env.MATISSE_ADMIN_FILE?JSON.parse(readFileSync(process.env.MATISSE_ADMIN_FILE,'utf8')).password:readFileSync('.dev.vars','utf8').match(/^LOCAL_ADMIN_PASSWORD=(.+)$/m)[1];const origin=new URL(page.url()).origin;const headers={Origin:origin,'Content-Type':'application/json'};
  const login=await page.request.post('/api/admin/login',{headers,data:{password}});expect(login.status()).toBe(200);const remove=await page.request.delete('/api/admin/leads/'+saved.id,{headers,data:{}});expect(remove.status()).toBe(200);const logout=await page.request.post('/api/admin/logout',{headers,data:{}});expect(logout.status()).toBe(200);
+});
+
+test('carrossel sem CTAs nos cartões permite arrastar com o rato e mapa só carrega por escolha',async({page})=>{
+ let mapRequests=0;await page.route('https://www.google.com/maps?**',route=>{mapRequests++;return route.abort();});
+ await page.goto('/');await page.getByRole('button',{name:'Só necessários'}).click();
+ await expect(page.locator('#service-rail button,#service-rail a')).toHaveCount(0);await expect(page.locator('.rail-controls')).toHaveCount(0);await expect(page.locator('#servicos .contact')).toHaveCount(1);
+ const rail=page.locator('#service-rail');await rail.scrollIntoViewIfNeeded();const box=await rail.boundingBox();const x=box.x+box.width*.7,y=box.y+130;await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x-330,y,{steps:12});await page.mouse.up();await expect.poll(()=>rail.evaluate(r=>r.scrollLeft)).toBeGreaterThan(100);
+ await expect(page.locator('[name="timing"],[name="goal"]')).toHaveCount(0);await expect(page.locator('#location-map iframe')).toHaveCount(0);expect(mapRequests).toBe(0);
+ await page.getByRole('button',{name:'Mostrar mapa'}).click();await expect(page.locator('#location-map iframe')).toHaveCount(1);const mapUrl=new URL(await page.locator('#location-map iframe').getAttribute('src'));expect(mapUrl.searchParams.get('q')).toContain('4430-204 Vila Nova de Gaia');await expect.poll(()=>mapRequests).toBe(1);
+});
+test('carrossel responde ao deslize de dedo num ecrã móvel',async({browser})=>{
+ const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844},...(process.env.MATISSE_TEST_ORIGIN?.startsWith('https:')&&process.env.HTTPS_PROXY?{proxy:{server:process.env.HTTPS_PROXY}}:{})});
+ try{const page=await context.newPage();await page.goto(process.env.MATISSE_TEST_ORIGIN||'http://localhost:8787');await page.getByRole('button',{name:'Só necessários'}).click();const rail=page.locator('#service-rail');await rail.scrollIntoViewIfNeeded();const b=await rail.boundingBox();const client=await context.newCDPSession(page);const x=b.x+b.width*.8,y=b.y+150;
+ await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let i=1;i<=10;i++){await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-i*19,y}]});}await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await expect.poll(()=>rail.evaluate(r=>r.scrollLeft)).toBeGreaterThan(50);
+ }finally{await context.close();}
 });

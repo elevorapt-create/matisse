@@ -62,6 +62,7 @@ for(const button of document.querySelectorAll('.contact')) button.addEventListen
  await configReady;
  if(!config){status.textContent='Não foi possível carregar o formulário. Feche e tente novamente.';$('#submit-lead').disabled=true;return;}
  $('[name="service"]').value=button.dataset.service||'';
+ if(button.dataset.professional)form.elements.notes.value='Gostaria de falar com '+button.dataset.professional+'.';
  if(!config.contactEnabled){status.textContent='O formulário está em preparação. Ainda não é possível registar pedidos.';$('#submit-lead').disabled=true;}else{$('#submit-lead').disabled=false;}
  if(button.dataset.service)track('ViewService');
  track('OpenLeadForm');
