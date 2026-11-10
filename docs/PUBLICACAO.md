@@ -53,3 +53,11 @@ Oito testes de browser passaram no endereço público, incluindo arrasto com rat
 Os logos usados são cópias binariamente idênticas às variantes transparentes oficiais, sem diminuir resolução. Rodapé preenchido com #b13015 e variante branca oficial. Cartões nominais de Jaine Matos e Jhon com iniciais, sem retratos ou qualificações fabricados. Campos de data e objetivo removidos de todas as apresentações do formulário único. Pormenores em AJUSTES-INTERACAO.md.
 
 Mapa: morada confirmada diretamente pelo utilizador, link original preservado, iframe opcional configurado e carregamento após clique testado. A requisição externa é abortada deliberadamente no teste; o conteúdo do Google Maps não foi visualmente validado nesta nuvem por bloqueio da política de rede. Os domínios necessários para prosseguir essa verificação foram guardados no rascunho do ambiente, que o utilizador deve rever, guardar e publicar para aplicar.
+
+## Logo vetorial e carrossel profissional
+
+Commit 2f89a6d enviado para main e publicado no Worker existente. Versão devolvida pelo Wrangler: ab1936dc-8a90-4a6b-9d83-b20ca73274e8.
+
+Logo substituído por SVG transparente obtido diretamente dos PDFs vetoriais oficiais, sem imagens raster nem texto dependente de fontes dentro do SVG. Removido o recorte/posicionamento anterior do cabeçalho. O recurso vetorial público respondeu HTTP 200. Retirado o nome de utilizador visível do Instagram no rodapé, preservando o ícone e ligação acessíveis.
+
+Cartões de profissionais com dimensões iguais às dos serviços em desktop e mobile, em carrossel com rato, toque e teclado. Nove testes de browser passaram no endereço público, incluindo medição de dimensões em 1440/390 px, arrasto profissional, toque em ambos os carrosséis e abertura do contacto de Jhon após arrasto. Nove testes locais e build/dry-run também passaram. Dados sintéticos eliminados pelos testes.
