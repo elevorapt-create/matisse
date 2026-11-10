@@ -31,37 +31,39 @@ tabs.forEach((tab,index)=>{
   event.preventDefault();selectService(next,true);
  });
 });
-const rail=document.querySelector('#service-rail');
-// Native touch scrolling; pointer capture supplies desktop mouse dragging.
-let drag=null;
-rail.addEventListener('pointerdown',event=>{
- if(event.pointerType!=='mouse'||event.button!==0)return;
- drag={id:event.pointerId,x:event.clientX,left:rail.scrollLeft};
- rail.setPointerCapture(event.pointerId);rail.classList.add('is-dragging');event.preventDefault();
-});
-rail.addEventListener('pointermove',event=>{
- if(!drag||event.pointerId!==drag.id)return;
- rail.scrollLeft=drag.left-(event.clientX-drag.x);
-});
-function stopDrag(event){
- if(!drag||event.pointerId!==drag.id)return;
- if(rail.hasPointerCapture(drag.id))rail.releasePointerCapture(drag.id);
- drag=null;rail.classList.remove('is-dragging');
+function enableCarousel(rail) {
+ let drag=null;
+ rail.addEventListener('pointerdown',event=>{
+  if(event.pointerType!=='mouse'||event.button!==0||event.target.closest('button,a,input,select,textarea'))return;
+  drag={id:event.pointerId,x:event.clientX,left:rail.scrollLeft};
+  rail.setPointerCapture(event.pointerId);rail.classList.add('is-dragging');event.preventDefault();
+ });
+ rail.addEventListener('pointermove',event=>{
+  if(!drag||event.pointerId!==drag.id)return;
+  rail.scrollLeft=drag.left-(event.clientX-drag.x);
+ });
+ function stopDrag(event){
+  if(!drag||event.pointerId!==drag.id)return;
+  if(rail.hasPointerCapture(drag.id))rail.releasePointerCapture(drag.id);
+  drag=null;rail.classList.remove('is-dragging');
+ }
+ rail.addEventListener('pointerup',stopDrag);
+ rail.addEventListener('pointercancel',stopDrag);
+ rail.addEventListener('lostpointercapture',()=>{drag=null;rail.classList.remove('is-dragging');});
+ rail.addEventListener('keydown',event=>{
+  if(event.target!==rail)return;
+  const step=rail.children[0].getBoundingClientRect().width+(parseFloat(getComputedStyle(rail).columnGap)||0);
+  let left;
+  if(event.key==='ArrowRight')left=rail.scrollLeft+step;
+  else if(event.key==='ArrowLeft')left=rail.scrollLeft-step;
+  else if(event.key==='Home')left=0;
+  else if(event.key==='End')left=rail.scrollWidth;
+  else return;
+  event.preventDefault();rail.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ });
 }
-rail.addEventListener('pointerup',stopDrag);
-rail.addEventListener('pointercancel',stopDrag);
-rail.addEventListener('lostpointercapture',()=>{drag=null;rail.classList.remove('is-dragging');});
-rail.addEventListener('keydown',event=>{
- if(event.target!==rail)return;
- const step=rail.children[0].getBoundingClientRect().width+17;
- let left;
- if(event.key==='ArrowRight')left=rail.scrollLeft+step;
- else if(event.key==='ArrowLeft')left=rail.scrollLeft-step;
- else if(event.key==='Home')left=0;
- else if(event.key==='End')left=rail.scrollWidth;
- else return;
- event.preventDefault();rail.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
-});
+enableCarousel(document.querySelector('#service-rail'));
+enableCarousel(document.querySelector('#professional-rail'));
 document.querySelector('#load-map').addEventListener('click',()=>{
  const frame=document.createElement('iframe');
  frame.title='Localização da Matisse By Jaine Matos em Vila Nova de Gaia';

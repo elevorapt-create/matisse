@@ -22,3 +22,11 @@ Inspeção em 1440 px e 390 px sem overflow horizontal; rodapé computado como r
 ## Limitação de rede do ambiente
 
 A abertura do link curto foi bloqueada pela política de rede. A morada foi obtida diretamente do utilizador. Foram guardados no rascunho os domínios maps.app.goo.gl, www.google.com e maps.google.com, preservando os domínios existentes. É necessário rever/guardar/publicar essa configuração do ambiente para permitir ao agente validar o conteúdo externo do Google Maps nesta nuvem. A incorporação no site usa HTTPS e a morada confirmada; nenhum endpoint do site necessita de aceder ao Google pelo servidor.
+
+## Ícone Instagram, carrossel de profissionais e logo vetorial
+
+- Removido o texto @matisse.pt do rodapé; mantidos o ícone, a ligação e o nome acessível para leitores de ecrã.
+- Cartões de profissionais com as mesmas dimensões dos cartões de serviços: 265 × 365 px em desktop e 78% da largura disponível × 370 px em mobile. O carrossel de dois profissionais usa uma janela com parte do cartão seguinte visível, permitindo efetivamente arrastar mesmo com apenas duas pessoas.
+- Ambos os carrosséis partilham o comportamento de rato, teclado e toque nativo. Interações nos botões/links dos cartões não iniciam arrasto.
+- Logos do cabeçalho, rodapé e cartões substituídos por SVGs transparentes extraídos dos PDFs vetoriais oficiais LOGO MD_A.pdf e LOGO MD_AP.pdf. Os textos do logo foram preservados como contornos, sem fontes externas e sem imagens raster dentro dos SVGs. O enquadramento inclui a marca completa e a assinatura. Removido o posicionamento que recortava a imagem do cabeçalho.
+- Nove testes de browser locais passaram, incluindo equivalência das dimensões em 1440/390 px, rato no carrossel profissional, toque em ambos e funcionamento do botão de contacto após arrasto. Build/dry-run passou. Inspeção visual do logo realizada com escala de ecrã 2×.

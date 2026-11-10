@@ -51,7 +51,16 @@ test('carrossel sem CTAs nos cartões permite arrastar com o rato e mapa só car
 });
 test('carrossel responde ao deslize de dedo num ecrã móvel',async({browser})=>{
  const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844},...(process.env.MATISSE_TEST_ORIGIN?.startsWith('https:')&&process.env.HTTPS_PROXY?{proxy:{server:process.env.HTTPS_PROXY}}:{})});
- try{const page=await context.newPage();await page.goto(process.env.MATISSE_TEST_ORIGIN||'http://localhost:8787');await page.getByRole('button',{name:'Só necessários'}).click();const rail=page.locator('#service-rail');await rail.scrollIntoViewIfNeeded();const b=await rail.boundingBox();const client=await context.newCDPSession(page);const x=b.x+b.width*.8,y=b.y+150;
- await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let i=1;i<=10;i++){await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-i*19,y}]});}await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await expect.poll(()=>rail.evaluate(r=>r.scrollLeft)).toBeGreaterThan(50);
+ try{const page=await context.newPage();await page.goto(process.env.MATISSE_TEST_ORIGIN||'http://localhost:8787');await page.getByRole('button',{name:'Só necessários'}).click();const client=await context.newCDPSession(page);for(const selector of ['#service-rail','#professional-rail']){const rail=page.locator(selector);await rail.scrollIntoViewIfNeeded();const b=await rail.boundingBox();const x=b.x+b.width*.8,y=b.y+150;
+ await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let i=1;i<=10;i++){await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-i*19,y}]});}await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await expect.poll(()=>rail.evaluate(r=>r.scrollLeft)).toBeGreaterThan(50);}
  }finally{await context.close();}
+});
+
+test('profissionais têm as dimensões dos serviços e o carrossel preserva os botões de contacto',async({page})=>{
+ await page.setViewportSize({width:1440,height:1000});await page.goto('/');await page.getByRole('button',{name:'Só necessários'}).click();
+ const rail=page.locator('#professional-rail');await rail.scrollIntoViewIfNeeded();
+ for(const width of [1440,390]){await page.setViewportSize({width,height:1000});const sizes=await page.evaluate(()=>{const a=document.querySelector('.service').getBoundingClientRect(),b=document.querySelector('.professional-card').getBoundingClientRect();return {service:[a.width,a.height],professional:[b.width,b.height]};});expect(Math.abs(sizes.service[0]-sizes.professional[0])).toBeLessThan(1);expect(sizes.service[1]).toBe(sizes.professional[1]);}
+ await page.setViewportSize({width:1440,height:1000});await rail.scrollIntoViewIfNeeded();const b=await rail.boundingBox();await page.mouse.move(b.x+b.width*.8,b.y+130);await page.mouse.down();await page.mouse.move(b.x+40,b.y+130,{steps:12});await page.mouse.up();await expect.poll(()=>rail.evaluate(r=>r.scrollLeft)).toBeGreaterThan(40);
+ await page.locator('[data-cta="professional-jhon"]').click();await expect(page.getByRole('dialog')).toBeVisible();await expect(page.getByLabel('Observações')).toHaveValue('Gostaria de falar com Jhon.');
+ await expect(page.locator('footer .instagram-link')).toHaveText('');
 });
