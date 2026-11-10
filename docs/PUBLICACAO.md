@@ -43,3 +43,13 @@ Tipografia: Bodoni Moda para títulos e Allura para o detalhe manuscrito, alojad
 Wrangler confirmou publicação no Worker existente, versão a3149f10-5b9c-4e0c-9b4b-d753166e0652. A página pública respondeu HTTP 200 e /api/health respondeu ok. Os seis testes de browser passaram no URL público, com TLS ativo: formulário modal, mobile sem overflow, falha de gravação, CRM, seletor de serviços e registo no formulário do final da página. Os pedidos sintéticos criados pelos testes foram eliminados pelos próprios testes.
 
 Antes da publicação passaram os oito testes automatizados, os seis testes de browser locais, o smoke test de integração e o build/dry-run. A infraestrutura D1, os segredos administrativos e o backend foram preservados.
+
+## Ajustes de interação, profissionais e mapa publicados
+
+Commit funcional b981510 enviado para main. Wrangler confirmou deploy no Worker existente, versão bf36fec3-aba6-41ca-8db5-b601271b0269. HTML público HTTP 200 confirmado com os novos logos transparentes, profissionais, mapa, Instagram e remoções solicitadas.
+
+Oito testes de browser passaram no endereço público, incluindo arrasto com rato, gesto de dedo num contexto móvel real do Chromium, formulário inline/modal, CRM e seleção de serviços. Oito testes automatizados, smoke test local e build/dry-run passaram antes da publicação. Pedidos sintéticos foram removidos pelos testes.
+
+Os logos usados são cópias binariamente idênticas às variantes transparentes oficiais, sem diminuir resolução. Rodapé preenchido com #b13015 e variante branca oficial. Cartões nominais de Jaine Matos e Jhon com iniciais, sem retratos ou qualificações fabricados. Campos de data e objetivo removidos de todas as apresentações do formulário único. Pormenores em AJUSTES-INTERACAO.md.
+
+Mapa: morada confirmada diretamente pelo utilizador, link original preservado, iframe opcional configurado e carregamento após clique testado. A requisição externa é abortada deliberadamente no teste; o conteúdo do Google Maps não foi visualmente validado nesta nuvem por bloqueio da política de rede. Os domínios necessários para prosseguir essa verificação foram guardados no rascunho do ambiente, que o utilizador deve rever, guardar e publicar para aplicar.
