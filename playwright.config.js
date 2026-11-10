@@ -1,2 +1,2 @@
 import {defineConfig} from '@playwright/test';
-export default defineConfig({testDir:'./tests/browser',workers:1,use:{baseURL:process.env.MATISSE_TEST_ORIGIN||'http://localhost:8787',headless:true,launchOptions:{executablePath:'/usr/bin/chromium',args:['--no-sandbox']},screenshot:'only-on-failure'},reporter:'list'});
+export default defineConfig({testDir:'./tests/browser',workers:1,use:{baseURL:process.env.MATISSE_TEST_ORIGIN||'http://localhost:8787',headless:true,...(process.env.MATISSE_TEST_ORIGIN?.startsWith('https:') && process.env.HTTPS_PROXY ? {proxy:{server:process.env.HTTPS_PROXY,bypass:'localhost,127.0.0.1'}} : {}),launchOptions:{executablePath:'/usr/bin/chromium',args:['--no-sandbox']},screenshot:'only-on-failure'},reporter:'list'});

@@ -25,4 +25,4 @@ try{
  r=await call('/api/admin/logout','POST',{},auth);assert.equal(r.status,200);
  r=await call('/api/admin/leads','GET',null,auth);assert.equal(r.status,401);
  console.log('PASS: página, cabeçalhos, CSRF, validação, consentimento, gravação, idempotência, WhatsApp, autenticação, pipeline, histórico, apagamento e revogação da sessão.');
-}catch(e){console.error('FAIL:',e.message);process.exitCode=1;}
+}catch(e){console.error('FAIL:',e.stack);process.exitCode=1;}

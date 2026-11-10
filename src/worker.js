@@ -47,11 +47,13 @@ async function session(req, env) {
  return row ? hash : null;
 }
 function sessionCookie(req, value, maxAge) { return `matisse_session=${value}; HttpOnly; SameSite=Strict; Path=/api/admin; Max-Age=${maxAge}${new URL(req.url).protocol === 'https:' ? '; Secure' : ''}`; }
-async function passwordValid(password, spec) {
- if (typeof password !== 'string' || password.length > 256 || !/^[a-f0-9]{32}:[a-f0-9]{64}$/.test(spec || '')) return false;
- const [salt, expected] = spec.split(':');
+export async function passwordValid(password, spec) {
+ if (typeof password !== 'string' || password.length > 256) return false;
+ const legacy = /^[a-f0-9]{32}:[a-f0-9]{64}$/.test(spec || '');
+ if (!legacy && !/^100000:[a-f0-9]{32}:[a-f0-9]{64}$/.test(spec || '')) return false;
+ const [salt, expected] = (legacy ? spec : spec.slice(7)).split(':');
  const key = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
- const result = hex(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: encoder.encode(salt), iterations: 310000 }, key, 256));
+ const result = hex(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: encoder.encode(salt), iterations: legacy ? 310000 : 100000 }, key, 256));
  let diff = 0; for (let i = 0; i < result.length; i++) diff |= result.charCodeAt(i) ^ expected.charCodeAt(i);
  return diff === 0;
 }
