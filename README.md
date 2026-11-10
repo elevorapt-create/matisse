@@ -2,7 +2,7 @@
 
 Landing page e CRM para o Worker existente `matisse`. Implementação local: HTML/CSS/JavaScript, Cloudflare Workers e D1. Sem framework nem serviços externos adicionais no runtime.
 
-**Estado:** versão preparada para o Worker existente com D1 de produção na UE. Consulte [docs/ESTADO.md](docs/ESTADO.md) para funcionalidades e limitações, e `docs/PUBLICACAO.md` para a evidência da publicação. Os comandos de desenvolvimento usam D1 local; a opção `--remote` atua sobre produção e deve ser usada apenas com revisão do destino.
+**Estado:** publicado em https://matisse.elevora-pt.workers.dev/ com D1 de produção na UE. Consulte [docs/ESTADO.md](docs/ESTADO.md) para funcionalidades e limitações, e `docs/PUBLICACAO.md` para a evidência da publicação. Os comandos de desenvolvimento usam D1 local; a opção `--remote` atua sobre produção e deve ser usada apenas com revisão do destino.
 
 ## Desenvolvimento
 
@@ -39,3 +39,7 @@ Migrations podem ser repetidas: só são aplicadas as pendentes. Nenhum segredo 
 ## Publicação
 
 Não existe script de deploy nem workflow automático incluído. O utilizador autorizou a publicação e o acesso Cloudflare já foi verificado. Fazer push para main depois dos testes e deploy com Wrangler no Worker existente. Ver `docs/CLOUDFLARE.md` para a sequência; o token atual não permite confirmar Cloudflare Builds. Não assumir deploy automático por main. Não criar outro Worker. Não assumir que processos locais, configuração .dev.vars ou autenticação sobrevivem a uma nova máquina.
+
+## Verificação pública
+
+Os testes admitem MATISSE_TEST_ORIGIN para escolher o destino. MATISSE_ADMIN_FILE aponta para o ficheiro privado de acesso de produção; não colocar o seu conteúdo na linha de comandos. Node.js 24 pode usar NODE_USE_ENV_PROXY=1 com a CA fornecida pelo ambiente. Chromium precisa de acesso à base NSS de confiança para testar HTTPS pelo proxy; o sandbox de ficheiros de leitura pode impedir esse acesso. Manter a verificação TLS ativa. Testes públicos criam dados sintéticos e devem terminar com a eliminação desses pedidos e logout. Não repetir testes sem necessidade, pois os rate limits de produção aplicam-se também à validação.

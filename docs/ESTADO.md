@@ -1,6 +1,6 @@
 # Matisse — estado de implementação
 
-Atualizado em 10 de novembro de 2026. Esta versão está preparada para publicar no Worker existente; os resultados do deploy são registados em `PUBLICACAO.md` depois da verificação externa.
+Atualizado em 10 de novembro de 2026. Esta versão foi publicada e verificada no Worker existente. Os resultados do deploy e dos testes no endereço público estão em `PUBLICACAO.md`.
 
 ## Implementado
 
@@ -25,7 +25,7 @@ Atualizado em 10 de novembro de 2026. Esta versão está preparada para publicar
 ## Validação
 
 - `npm run check`: sintaxe dos módulos.
-- `npm test`: sete testes, incluindo limpeza de dados em SQLite/workerd.
+- `npm test`: oito testes, incluindo limpeza de dados em SQLite/workerd.
 - Smoke test: gravação, idempotência, validação, origem, eventos, autenticação, pipeline, histórico, apagamento e revogação da sessão.
 - Quatro testes Chromium: desktop, mobile, falha de gravação e login do CRM.
 - `npm run build`: dry-run do bundle e configuração Cloudflare.
