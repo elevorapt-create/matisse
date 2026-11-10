@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 let browserLeadId;
 test('desktop: consentimento, formulário e WhatsApp só após registo',async({page})=>{
  const events=[];page.on('request',req=>{if(req.url().endsWith('/api/events'))events.push(req);});
- await page.goto('/');await expect(page.getByRole('heading',{level:1})).toContainText('A sua beleza é única');
+ await page.goto('/');await expect(page.getByRole('heading',{level:1})).toContainText('A sua beleza é única');await page.evaluate(()=>document.fonts.ready);expect(await page.evaluate(()=>document.fonts.check('40px \"Bodoni Moda\"'))).toBe(true);await expect(page.getByRole('heading',{level:1})).toHaveCSS('font-family','\"Bodoni Moda\", serif');
  await page.getByRole('button',{name:'Só necessários'}).click();expect(events).toHaveLength(0);
  await page.getByRole('button',{name:'Quero transformar o meu cabelo'}).click();
  await expect(page.getByRole('dialog')).toBeVisible();await expect(page.locator('#open-whatsapp')).toBeHidden();

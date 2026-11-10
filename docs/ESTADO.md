@@ -33,9 +33,13 @@ Atualizado em 10 de novembro de 2026. Esta versão foi publicada e verificada no
 
 ## Materiais e limites
 
-- Logótipo/sublogo e paleta do ZIP oficial preservados. Le Grand Capital e High Spirited não foram fornecidas como fontes web; texto usa Georgia/Arial, enquanto o logótipo mantém a tipografia original.
+- Logótipo/sublogo e paleta do ZIP oficial preservados. Le Grand Capital e High Spirited não foram fornecidas como fontes web. Após autorização para a melhor aproximação possível, a landing usa Bodoni Moda e Allura (OFL, alojadas localmente). O logótipo mantém a tipografia original.
 - Retratos enviados inline foram vistos, mas não estão expostos como ficheiros nesta máquina. O utilizador autorizou imagens geradas: foram criadas duas imagens editoriais sem representar a Jaine, clientes, resultados, produtos endossados ou o espaço real.
 - WhatsApp confirmado pelo utilizador: +351 928 276 081. Morada e e-mail transcritos do cartão oficial. Não foram inventados horários, qualificações, biografia, preços, avaliações ou resultados.
 - Galeria de clientes e avaliações não são apresentadas enquanto não houver materiais verificáveis. Os serviços correspondem à lista inicial fornecida pelo utilizador.
 - Não existe integração ativa Google Ads, Google Analytics ou Meta. Não se afirma validação de conversões nessas plataformas. O envio exige os identificadores e configuração respetivos.
 - As condições específicas de cada marcação devem ser combinadas diretamente com a Matisse. Não foi criada uma política com prazos ou penalizações fictícias.
+
+## Revisão de composição
+
+Refeita a landing segundo a referência: hero panorâmico com painel sobreposto, pilares centrados, serviços em cartões fotográficos horizontais, apresentação em duas colunas, seletor de serviços, imagem editorial horizontal, formulário no final da página, faixa de imagens e rodapé reorganizado. Um único formulário serve o final da página e os CTAs modais. Não foram adicionados profissionais, avaliações, preços ou vídeos fictícios. Ver REVISAO-VISUAL.md.

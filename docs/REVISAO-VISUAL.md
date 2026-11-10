@@ -1,6 +1,6 @@
 # Revisão visual segundo a referência enviada
 
-Estado: revisão local testada, não enviada para main nem publicada. A tipografia exata pedida pelo utilizador é um requisito ainda pendente de ficheiros.
+Estado: revisão autorizada para publicação. O utilizador informou que não tem os ficheiros originais e pediu a melhor aproximação possível ao modelo. A publicação é registada em PUBLICACAO.md após verificação.
 
 ## Composição revista
 
@@ -14,15 +14,13 @@ Estado: revisão local testada, não enviada para main nem publicada. A tipograf
 - Faixa de fotografias editoriais, chamada final e rodapé com contactos e navegação.
 - Um único formulário: fica no final da página e é movido para o modal quando se utiliza um CTA. Ao fechar o modal, regressa ao local original, sem duplicar IDs, componentes ou handlers.
 
-## Tipografia — requisito ainda não concluído
+## Tipografia adotada com autorização do utilizador
 
-O manual confirma Le Grand Capital (Calamar) e High Spirited (Octotype). Não existem ficheiros .otf, .ttf, .woff ou .woff2 dessas fontes no ZIP fornecido.
+O manual identifica Le Grand Capital (Calamar) e High Spirited (Octotype). Como não foram fornecidos os ficheiros completos e o utilizador autorizou uma aproximação, são utilizadas Bodoni Moda nos títulos e Allura no detalhe manuscrito. Não são apresentadas como as fontes originais.
 
-Os PDFs contêm subsets de fontes, não os desenhos completos. A inspeção das tabelas glyf confirmou, por exemplo, apenas os desenhos ABCDESabcde num dos subsets Le Grand Capital, apesar de a tabela cmap enumerar muitos outros caracteres. Os restantes subsets das aplicações também só contêm as letras efetivamente usadas em cada arte. Extraí-los como uma suposta fonte completa faria desaparecer letras do website.
+As fontes foram obtidas do repositório oficial google/fonts (ofl/bodonimoda e ofl/allura), convertidas para WOFF2 e alojadas no próprio website. As licenças OFL acompanham os ficheiros em public/assets/fonts/. A cobertura dos caracteres acentuados portugueses foi verificada. O browser valida o carregamento real de Bodoni Moda e a família efetivamente aplicada ao título.
 
-CSS identifica os nomes das famílias oficiais, mas ainda utiliza uma fonte de sistema para permitir trabalhar na composição local. Isso não significa que Le Grand Capital ou High Spirited estejam carregadas. Não publicar esta revisão como concluída sem os ficheiros originais e sem verificar visualmente a tipografia aplicada.
-
-O logótipo continua a usar a arte original, que já preserva as suas letras e assinatura.
+O logótipo continua a usar a arte original, com a sua tipografia e assinatura intactas. A composição não altera os ficheiros oficiais do logótipo.
 
 ## Materiais
 
@@ -37,4 +35,4 @@ Não foram fabricados profissionais, preços, avaliações, vídeo ou mapa do es
 - Sem erros JavaScript na navegação inspecionada.
 - Sem overflow horizontal em desktop 1440 px e mobile 390 px.
 - Build/dry-run concluído sem publicação.
-- Pré-visualizações guardadas fora do checkout em /workspace/matisse-design-review/. A fonte de sistema visível nessas imagens é temporária; falta receber os dois ficheiros de fonte.
+- Pré-visualizações guardadas fora do checkout em /workspace/matisse-design-review/. As prévias finais incluem as famílias de aproximação autorizadas, alojadas localmente.
