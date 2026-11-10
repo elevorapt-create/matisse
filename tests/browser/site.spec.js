@@ -25,3 +25,18 @@ test('erros de gravação não abrem o WhatsApp',async({page})=>{
 test('admin: login e painel sem dados expostos antes de autenticação',async({page})=>{
  await page.goto('/admin');await expect(page.locator('#crm')).toBeHidden();const password=process.env.MATISSE_ADMIN_FILE?JSON.parse(readFileSync(process.env.MATISSE_ADMIN_FILE,'utf8')).password:readFileSync('.dev.vars','utf8').match(/^LOCAL_ADMIN_PASSWORD=(.+)$/m)[1];await page.getByLabel('Palavra-passe').fill(password);await page.getByRole('button',{name:'Entrar no CRM'}).click();await expect(page.locator('#crm')).toBeVisible();await expect(page.locator('#stats')).toContainText('Total de leads');if(browserLeadId){const r=await page.request.delete('/api/admin/leads/'+browserLeadId,{headers:{Origin:new URL(page.url()).origin,'Content-Type':'application/json'},data:{}});expect(r.status()).toBe(200);}await page.getByRole('button',{name:'Terminar sessão'}).click();await expect(page.locator('#crm')).toBeHidden();
 });
+test('seletor de serviços abre o mesmo formulário com a escolha atual e devolve-o ao rodapé',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Só necessários'}).click();
+ await expect(page.locator('#inline-form-host #lead-form')).toHaveCount(1);
+ const tab=page.getByRole('tab',{name:'Visagismo',exact:true});await tab.click();await expect(tab).toHaveAttribute('aria-selected','true');await expect(page.locator('#detail-title')).toHaveText('Visagismo');
+ await page.getByRole('button',{name:'Conversar sobre este serviço'}).click();
+ await expect(page.locator('#lead-dialog #lead-form')).toHaveCount(1);await expect(page.getByLabel('Serviço pretendido')).toHaveValue('Visagismo');await expect(page.locator('#lead-form')).toHaveCount(1);
+ await page.keyboard.press('Escape');await expect(page.locator('#inline-form-host #lead-form')).toHaveCount(1);await expect(page.getByRole('dialog')).not.toBeVisible();
+});
+test('formulário do final da página regista um pedido sem precisar de abrir um modal',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Só necessários'}).click();
+ await page.getByLabel('Nome',{exact:true}).fill('Teste inline');await page.getByLabel('E-mail',{exact:true}).fill('inline@example.invalid');await page.getByLabel('WhatsApp',{exact:true}).fill('+351900000003');await page.getByLabel('Serviço pretendido').selectOption('Visagismo');
+ await page.waitForTimeout(1600);const response=page.waitForResponse(r=>r.url().endsWith('/api/leads')&&r.request().method()==='POST');await page.getByRole('button',{name:'Registar pedido e continuar'}).click();const savedResponse=await response;expect(savedResponse.status()).toBe(201);const saved=await savedResponse.json();expect(JSON.parse(savedResponse.request().postData()).cta).toBe('inline-form');await expect(page.locator('#lead-success')).toBeVisible();await expect(page.getByRole('dialog')).not.toBeVisible();
+ const password=process.env.MATISSE_ADMIN_FILE?JSON.parse(readFileSync(process.env.MATISSE_ADMIN_FILE,'utf8')).password:readFileSync('.dev.vars','utf8').match(/^LOCAL_ADMIN_PASSWORD=(.+)$/m)[1];const origin=new URL(page.url()).origin;const headers={Origin:origin,'Content-Type':'application/json'};
+ const login=await page.request.post('/api/admin/login',{headers,data:{password}});expect(login.status()).toBe(200);const remove=await page.request.delete('/api/admin/leads/'+saved.id,{headers,data:{}});expect(remove.status()).toBe(200);const logout=await page.request.post('/api/admin/logout',{headers,data:{}});expect(logout.status()).toBe(200);
+});
