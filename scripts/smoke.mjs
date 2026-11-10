@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-const origin='http://localhost:8787';
+const origin=process.env.MATISSE_TEST_ORIGIN||'http://localhost:8787';
 const headers={'Content-Type':'application/json',Origin:origin};
 const password=readFileSync('.dev.vars','utf8').match(/^LOCAL_ADMIN_PASSWORD=(.+)$/m)?.[1];
 const call=(path,method='GET',body,extra={})=>fetch(origin+path,{method,headers:{...headers,...extra},...(body?{body:JSON.stringify(body)}:{})});

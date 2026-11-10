@@ -38,4 +38,4 @@ Migrations podem ser repetidas: só são aplicadas as pendentes. Nenhum segredo 
 
 ## Publicação
 
-Não existe script de deploy nem workflow automático incluído. Não executar `wrangler deploy` ou push até concluir os requisitos de `docs/ESTADO.md`, confirmar a integração real do Worker e receber autorização vigente para publicação. Não criar outro Worker. Não assumir que processos locais, configuração .dev.vars ou autenticação sobrevivem a uma nova máquina.
+Não existe script de deploy nem workflow automático incluído. O utilizador já autorizou a publicação. O push de código para main pode ser realizado depois dos testes; o deploy do Worker continua dependente do acesso e dos bindings finais de produção descritos em `docs/CLOUDFLARE.md`. Não criar outro Worker. Não assumir que processos locais, configuração .dev.vars ou autenticação sobrevivem a uma nova máquina.

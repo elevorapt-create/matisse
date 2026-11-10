@@ -41,3 +41,9 @@ WhatsApp confirmado pelo utilizador: +351 928 276 081 (prevalece sobre o número
 8. Só depois da revisão legal e operacional ativar CONTACT_ENABLED e WHATSAPP_NUMBER no ambiente público. Adicionar domínio definitivo/canonical, sitemap e indexação apenas após decisão de SEO.
 9. Configurar IDs Google/Meta e rotas/concessões necessárias numa tarefa posterior. Não existe envio de conversões para essas plataformas; apenas infraestrutura interna validada.
 10. Validar a fase final com fotografias, acessibilidade/performance em produção, autorização de publicação, push para main e confirmação de deploy no Worker existente. A ausência de push nesta sessão é intencional.
+
+## Atualização após autorização de publicação
+
+O utilizador autorizou imagens criadas e publicação. Foram geradas duas imagens editoriais ilustrativas, identificadas como IA no site, incorporadas no hero e na secção institucional. Não são resultados de clientes nem retratos da Jaine. Os logótipos oficiais permanecem intactos.
+
+A restrição anterior de não publicar foi revogada pelo utilizador. `wrangler whoami` confirmou que falta autenticação Cloudflare. Foi guardado o requisito secreto CLOUDFLARE_API_TOKEN e o destino api.cloudflare.com nas definições do ambiente. Ver `CLOUDFLARE.md` para as permissões e a sequência de validação. A autorização não constitui acesso autenticado nem prova de deploy.
