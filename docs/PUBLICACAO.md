@@ -31,3 +31,15 @@ As credenciais são entregues num ficheiro privado fora do checkout e dos assets
 ## Limites preservados
 
 Noindex/nofollow e robots bloqueado no domínio provisório. Google Ads, Meta e Analytics não ativados. Galeria de resultados e avaliações reais não foram fabricadas. As duas imagens editoriais estão identificadas como criadas com IA. Fontes web oficiais e fotografias originais em ficheiros continuam disponíveis para integração futura quando forem fornecidas; o logótipo original está preservado.
+
+## Revisão visual publicada — referência e tipografia aproximada
+
+O utilizador confirmou que não possui os ficheiros originais e autorizou reproduzir o modelo da melhor forma e publicar. A revisão local 26e1c1c e a finalização 07e15a9 foram enviadas para main.
+
+Publicada a composição revista: hero panorâmico com painel sobreposto, serviços fotográficos horizontais, apresentação em duas colunas, seletor de serviços, imagem editorial, formulário reutilizável também no final da página e rodapé reorganizado.
+
+Tipografia: Bodoni Moda para títulos e Allura para o detalhe manuscrito, alojadas localmente com licenças OFL. São aproximações autorizadas, não as fontes originais Le Grand Capital e High Spirited. O logótipo oficial não foi alterado. O carregamento efetivo das fontes foi observado no browser.
+
+Wrangler confirmou publicação no Worker existente, versão a3149f10-5b9c-4e0c-9b4b-d753166e0652. A página pública respondeu HTTP 200 e /api/health respondeu ok. Os seis testes de browser passaram no URL público, com TLS ativo: formulário modal, mobile sem overflow, falha de gravação, CRM, seletor de serviços e registo no formulário do final da página. Os pedidos sintéticos criados pelos testes foram eliminados pelos próprios testes.
+
+Antes da publicação passaram os oito testes automatizados, os seis testes de browser locais, o smoke test de integração e o build/dry-run. A infraestrutura D1, os segredos administrativos e o backend foram preservados.
